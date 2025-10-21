@@ -14,8 +14,40 @@ intents.members=True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+secret_role="gamer".title()
+
 @bot.event
 async def on_ready():
     print(f"We are ready to go in, {bot.user.name}")
+
+@bot.event
+async def on_member_join(ctx, member:discord.Member):
+    await ctx.channel.send(f"Welcome to the server {member.display_name}!")
+
+@bot.event
+async def on_message(message):
+    if message.author==bot.user:
+        return 
+    if "shit" in message.content.lower():
+        await message.delete()
+        await message.channel.send(f"{message.author.mention} dont use that word!")
+    
+    await bot.process_commands(message)
+
+
+@bot.command()
+async def hello (ctx):
+    await ctx.send(f"Hello {ctx.author.mention}!")
+
+@bot.command()
+async def assign(ctx):
+    role=discord.utils.get(ctx.guild.roles, name=secret_role)
+    if role:
+        await ctx.author.add_roles(role)
+        await ctx.send(F"{ctx.author.mention} is now assigned to {secret_role}!")
+    else:
+        await ctx.send("Role doesnt exist!")
+        
+
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
